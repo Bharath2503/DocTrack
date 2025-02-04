@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Col, Form, Row, Table } from "react-bootstrap";
 import { FaDeleteLeft } from "react-icons/fa6";
-import './DocumentList.css';  // Import the new CSS file
+import "./DocumentList.css"; // Import the new CSS file
 
 function DocumentList({ applicantId, applicants, setApplicants }) {
   const [documentName, setDocumentName] = useState("");
@@ -100,19 +100,25 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
 
       {/* Add Document Form */}
       <Form onSubmit={handleAddDocument}>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            placeholder="Enter Document Name"
-            value={documentName}
-            onChange={(e) => setDocumentName(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <br />
-        <Button type="submit" size="sm">
-          + Add Document
-        </Button>
+        <Row className=" m-3 justify-content-center">
+          <Col xs="auto" className="mt-3">
+            <Form.Group>
+              <Form.Control
+                type="text"
+                size="sm"
+                placeholder="Enter Document Name"
+                value={documentName}
+                onChange={(e) => setDocumentName(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Col>
+          <Col xs="auto" className="mt-3">
+            <Button type="submit" size="sm">
+              + Add Document
+            </Button>
+          </Col>
+        </Row>
       </Form>
 
       {/* Document List in a Single Row */}
@@ -123,7 +129,9 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
           applicant.documents.map((doc) => (
             <div key={doc.id} className="document-item">
               <Button
-                variant={selectedDocument === doc.id ? "primary" : "outline-primary"}
+                variant={
+                  selectedDocument === doc.id ? "primary" : "outline-primary"
+                }
                 size="sm"
                 onClick={() =>
                   setSelectedDocument(
