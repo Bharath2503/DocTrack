@@ -89,6 +89,7 @@ function AddApplicant() {
             {applicants.map((applicant, index) => (
               <Col key={applicant.id} xs="auto">
                 <Button
+                  title="Toogle to Open/Close"
                   variant="success"
                   size="lg"
                   className="applicant-name"

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Button, Form } from "react-bootstrap";
 import { FaDeleteLeft } from "react-icons/fa6";
+import { Row, Col } from "react-bootstrap";
 
 function DocumentList({ applicantId, applicants, setApplicants }) {
   const [documentName, setDocumentName] = useState("");
@@ -105,19 +106,25 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
 
       {/* Add Document Form */}
       <Form onSubmit={handleAddDocument}>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            placeholder="Enter Document Name"
-            value={documentName}
-            onChange={(e) => setDocumentName(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <br />
-        <Button type="submit" size="sm">
-          + Add Document
-        </Button>
+        <Row className=" m-3 justify-content-center">
+          <Col xs="auto" className="mt-2">
+            <Form.Group>
+              <Form.Control
+                type="text"
+                size="lg"
+                placeholder="Enter Document Name"
+                value={documentName}
+                onChange={(e) => setDocumentName(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Col>
+          <Col xs="auto" className="mt-2">
+            <Button type="submit" size="lg">
+              + Add Document
+            </Button>
+          </Col>
+        </Row>
       </Form>
 
       {/* Document List */}
@@ -146,6 +153,7 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
                 variant={
                   selectedDocument === doc.id ? "primary" : "outline-primary"
                 }
+                title="Toogle to Open/Close"
                 size="sm"
                 onClick={() =>
                   setSelectedDocument(
@@ -199,19 +207,26 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
           {/* File upload for the selected document */}
           {!fileUploadedStatus[selectedDocument] && (
             <>
-              <Form.Group>
-                <Form.Control
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-              </Form.Group>
-              <Button
-                size="sm"
-                onClick={() => handleAddFileToDocument(selectedDocument)}
-              >
-                + Add File
-              </Button>
+              <Row className=" m-3 justify-content-center">
+                <Col xs="auto" className="mt-2">
+                  <Form.Group>
+                    <Form.Control
+                      type="file"
+                      size="sm"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs="auto" className="mt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleAddFileToDocument(selectedDocument)}
+                  >
+                    + Add File
+                  </Button>
+                </Col>
+              </Row>
             </>
           )}
         </div>
