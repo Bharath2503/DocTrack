@@ -1,43 +1,93 @@
 import React, { useState, useRef } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Table } from "react-bootstrap";
+import { FaDeleteLeft } from "react-icons/fa6";
+import './DocumentList.css';  // Import the new CSS file
 
 function DocumentList({ applicantId, applicants, setApplicants }) {
   const [documentName, setDocumentName] = useState("");
   const [file, setFile] = useState(null);
-  const fileInputRef = useRef(null); // Ref to reset file input
+  const [selectedDocument, setSelectedDocument] = useState(null); // Track selected document for details
+  const fileInputRef = useRef(null);
 
-  // Find the specific applicant
   const applicant = applicants.find((app) => app.id === applicantId);
 
-  // Handle adding a new document
+  // Add a new document
   const handleAddDocument = (e) => {
     e.preventDefault();
 
-    if (documentName.trim() !== "" && file) {
+    if (documentName.trim() !== "") {
       const newDocument = {
         id: Date.now(),
         name: documentName,
-        file: file.name, // Store file name
-        fileObject: file, // Store the actual file object
+        files: [], // Initially, no files
       };
 
-      // Update the applicant's document list
       const updatedApplicants = applicants.map((app) =>
-        app.id === applicantId ? { ...app, documents: [...app.documents, newDocument] } : app
+        app.id === applicantId
+          ? { ...app, documents: [...app.documents, newDocument] }
+          : app
       );
 
       setApplicants(updatedApplicants);
-      setDocumentName(""); // Clear inputs
-      setFile(null);
-      fileInputRef.current.value = ""; // ✅ Reset file input field
+      setDocumentName(""); // Clear input
     }
   };
 
-  // Handle deleting a document
-  const handleDeleteDocument = (id) => {
+  // Add file to an existing document
+  const handleAddFileToDocument = (docId) => {
+    if (file) {
+      const updatedApplicants = applicants.map((app) =>
+        app.id === applicantId
+          ? {
+              ...app,
+              documents: app.documents.map((doc) =>
+                doc.id === docId
+                  ? {
+                      ...doc,
+                      files: [
+                        ...doc.files,
+                        {
+                          id: Date.now(),
+                          name: file.name,
+                          url: URL.createObjectURL(file),
+                        },
+                      ],
+                    }
+                  : doc
+              ),
+            }
+          : app
+      );
+
+      setApplicants(updatedApplicants);
+      setFile(null); // Reset file input
+      fileInputRef.current.value = ""; // Reset file input field
+    }
+  };
+
+  // Delete a file from a document
+  const handleDeleteFile = (docId, fileId) => {
     const updatedApplicants = applicants.map((app) =>
       app.id === applicantId
-        ? { ...app, documents: app.documents.filter((doc) => doc.id !== id) }
+        ? {
+            ...app,
+            documents: app.documents.map((doc) =>
+              doc.id === docId
+                ? { ...doc, files: doc.files.filter((f) => f.id !== fileId) }
+                : doc
+            ),
+          }
+        : app
+    );
+
+    setApplicants(updatedApplicants);
+  };
+
+  // Delete a document
+  const handleDeleteDocument = (docId) => {
+    const updatedApplicants = applicants.map((app) =>
+      app.id === applicantId
+        ? { ...app, documents: app.documents.filter((doc) => doc.id !== docId) }
         : app
     );
 
@@ -45,58 +95,127 @@ function DocumentList({ applicantId, applicants, setApplicants }) {
   };
 
   return (
-    <div style={{ marginLeft: "20px", padding: "10px", border: "1px solid #ccc", borderRadius: "8px" }}>
+    <div className="document-section">
       <h3>Documents for {applicant.name}</h3>
 
-      {/* Add document form */}
+      {/* Add Document Form */}
       <Form onSubmit={handleAddDocument}>
-        <Form.Control
-          type="text"
-          placeholder="Enter Document Name"
-          value={documentName}
-          onChange={(e) => setDocumentName(e.target.value)}
-          required
-        />
+        <Form.Group>
+          <Form.Control
+            type="text"
+            placeholder="Enter Document Name"
+            value={documentName}
+            onChange={(e) => setDocumentName(e.target.value)}
+            required
+          />
+        </Form.Group>
         <br />
-
-        <Form.Control type="file" ref={fileInputRef} onChange={(e) => setFile(e.target.files[0])} required />
-        <br />
-
         <Button type="submit" size="sm">
           + Add Document
         </Button>
       </Form>
 
-      {/* Display list of uploaded documents */}
-      <div style={{ marginTop: "10px" }}>
+      {/* Document List in a Single Row */}
+      <div className="document-list">
         {applicant?.documents.length === 0 ? (
           <p>No documents added.</p>
         ) : (
           applicant.documents.map((doc) => (
-            <div
-              key={doc.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <div>
-                <span>{doc.name}</span> {/* Document Name */}
-                <br />
-                <small>{doc.file}</small> {/* Display uploaded file name */}
-                {/* <a href={URL.createObjectURL(doc.fileObject)} download={doc.file} style={{ marginLeft: "10px" }}>
-                  [Download]
-                </a> */}
-              </div>
-              <Button variant="danger" size="sm" onClick={() => handleDeleteDocument(doc.id)}>
-                Delete
+            <div key={doc.id} className="document-item">
+              <Button
+                variant={selectedDocument === doc.id ? "primary" : "outline-primary"}
+                size="sm"
+                onClick={() =>
+                  setSelectedDocument(
+                    selectedDocument === doc.id ? null : doc.id
+                  )
+                }
+              >
+                {doc.name}
+              </Button>
+
+              {/* Delete Document Button */}
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => handleDeleteDocument(doc.id)}
+              >
+                <FaDeleteLeft />
               </Button>
             </div>
           ))
         )}
       </div>
+
+      {/* Selected Document Details Section */}
+      {selectedDocument && (
+        <div className="selected-document">
+          <h5>
+            Files for{" "}
+            {
+              applicant.documents.find((doc) => doc.id === selectedDocument)
+                ?.name
+            }
+          </h5>
+
+          {applicant.documents.find((doc) => doc.id === selectedDocument)?.files
+            .length === 0 ? (
+            <p>No files uploaded for this document.</p>
+          ) : (
+            <Table striped bordered size="sm" className="table-file-list">
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applicant.documents
+                  .find((doc) => doc.id === selectedDocument)
+                  ?.files.map((file) => (
+                    <tr key={file.id}>
+                      <td>
+                        <a
+                          href={file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {file.name}
+                        </a>
+                      </td>
+                      <td>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() =>
+                            handleDeleteFile(selectedDocument, file.id)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
+          )}
+
+          {/* File upload for the selected document */}
+          <Form.Group>
+            <Form.Control
+              type="file"
+              ref={fileInputRef}
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+          </Form.Group>
+          <Button
+            size="sm"
+            onClick={() => handleAddFileToDocument(selectedDocument)}
+          >
+            + Add File
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

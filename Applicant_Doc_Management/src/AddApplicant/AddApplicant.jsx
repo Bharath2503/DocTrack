@@ -43,7 +43,7 @@ function AddApplicant() {
   return (
     <>
       <Form onSubmit={handleCreate}>
-        <h1 className="m-2 ">
+        <h1 className="header text-center text-sm-start">
           {" "}
           <img
             src="https://icons.veryicon.com/png/o/business/general-office-icon/general-upload-file.png"
