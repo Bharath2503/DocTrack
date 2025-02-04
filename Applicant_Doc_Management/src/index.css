@@ -1,0 +1,24 @@
+body {
+  margin: 10px;
+  padding: 10px;
+  background-color: #E3F2FD !important;
+  color: #37474F !important;
+}
+
+.applicant-name {
+  padding: 10px;
+  margin: 5px;
+  font-size: 18px !important;
+  text-align: center !important;
+  font-weight: bold !important;
+  border: 1px solid;
+}
+
+.eachapplicant {
+  overflow-x: scroll;
+  width: 95vw;
+}
+
+.delete-btn {
+  margin-left: 10px;
+}
