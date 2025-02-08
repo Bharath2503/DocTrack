@@ -90,8 +90,8 @@ body {
 
 /* File Upload */
 .fileUpload {
-  padding: 5%;
-  margin: 2%;
+  padding:20px;
+  margin: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,5 +118,5 @@ body {
   border: 1px solid #ccc;
   text-align: center;
   margin-right: 10px;
-  width: 5%;
+  /* width: 5%; */
 }
